@@ -28,6 +28,7 @@ export interface TagResponse {
 
 export interface EmbedOptions {
     type?: 'image' | 'text';
+    mode?: 'api' | 'local';
 }
 
 export interface EmbedResponse {
@@ -152,6 +153,12 @@ export class CoreViz {
     }
 
     async embed(input: string, options?: EmbedOptions): Promise<EmbedResponse> {
+        const mode = options?.mode || 'api';
+
+        if (mode === 'local') {
+            return this.embedLocal(input, options);
+        }
+
         try {
             const headers = this.getHeaders();
             let body: { image?: string; text?: string } = {};
@@ -183,6 +190,29 @@ export class CoreViz {
             return data;
         } catch (err) {
             throw err instanceof Error ? err : new Error("An unexpected error occurred.");
+        }
+    }
+
+    private async embedLocal(input: string, options?: EmbedOptions): Promise<EmbedResponse> {
+        try {
+            // Dynamic import to avoid loading transformers if not used
+            const { pipeline } = await import('@huggingface/transformers');
+
+            // Initialize the pipeline with the specified model
+            // This will automatically download and cache the model if not present
+            const extractor = await pipeline('feature-extraction', 'Xenova/clip-vit-large-patch14');
+
+            // Generate embeddings
+            // transformers.js handles text strings, image URLs, and image paths automatically
+            const output = await extractor(input, { pooling: 'mean', normalize: true });
+
+            // Convert Float32Array to regular array
+            // @ts-ignore - Output type inference might fail with dynamic import
+            const embedding = Array.from(output.data);
+
+            return { embedding };
+        } catch (err) {
+            throw err instanceof Error ? err : new Error("Local embedding failed: " + String(err));
         }
     }
 
