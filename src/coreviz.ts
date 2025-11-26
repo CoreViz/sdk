@@ -201,19 +201,11 @@ export class CoreViz {
                 AutoProcessor,
                 CLIPTextModelWithProjection,
                 CLIPVisionModelWithProjection,
-                RawImage,
-                env
+                RawImage
             } = await import('@huggingface/transformers');
 
-            // Force browser backend to use webgpu if available
-            // @ts-ignore
-            if (typeof navigator !== 'undefined' && navigator.gpu && env.backends?.onnx?.wasm) {
-                // @ts-ignore
-                env.backends.onnx.wasm.proxy = false;
-            }
 
             const MODEL_ID = 'Xenova/clip-vit-large-patch14';
-            const device = 'webgpu';
 
             console.log(`Loading local model ${MODEL_ID}...`);
             const start = Date.now();
@@ -223,12 +215,8 @@ export class CoreViz {
             const processor = await AutoProcessor.from_pretrained(MODEL_ID);
 
             // Load models with device preference
-            const text_model = await CLIPTextModelWithProjection.from_pretrained(MODEL_ID, {
-                device: device,
-            });
-            const vision_model = await CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, {
-                device: device,
-            });
+            const text_model = await CLIPTextModelWithProjection.from_pretrained(MODEL_ID);
+            const vision_model = await CLIPVisionModelWithProjection.from_pretrained(MODEL_ID);
 
             console.log(`Model loaded in ${Date.now() - start}ms`);
 
