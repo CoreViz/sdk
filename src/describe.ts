@@ -1,15 +1,27 @@
 import { resize } from './resize';
 
-export async function describe(image: string) {
+export interface DescribeOptions {
+    token?: string;
+    apiKey?: string;
+}
+
+export async function describe(image: string, options?: DescribeOptions) {
     try {
         const resizedImage = await resize(image);
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+        };
+
+        if (options?.token) {
+            headers['Authorization'] = `Bearer ${options.token}`;
+        } else {
+            headers['x-api-key'] = options?.apiKey || process.env.COREVIZ_API_KEY || "";
+        }
+
         const response = await fetch(`https://lab.coreviz.io/api/ai/describe`, {
             method: 'POST',
-            headers: {
-                'x-api-key': process.env.COREVIZ_API_KEY || "",
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({ image: resizedImage }),
         });
 

@@ -4,6 +4,8 @@ export interface TagOptions {
     prompt: string;
     options?: string[];
     multiple?: boolean;
+    token?: string;
+    apiKey?: string;
 }
 
 export interface TagResponse {
@@ -15,12 +17,19 @@ export async function tag(image: string, options: TagOptions): Promise<TagRespon
     try {
         const resizedImage = await resize(image);
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+        };
+
+        if (options.token) {
+            headers['Authorization'] = `Bearer ${options.token}`;
+        } else {
+            headers['x-api-key'] = options.apiKey || process.env.COREVIZ_API_KEY || "";
+        }
+
         const response = await fetch("https://lab.coreviz.io/api/ai/tag", {
             method: 'POST',
-            headers: {
-                'x-api-key': process.env.COREVIZ_API_KEY || "",
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 image: resizedImage,
                 prompt: options.prompt,

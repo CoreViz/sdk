@@ -1,7 +1,7 @@
-import { describe } from './describe';
+import { describe, DescribeOptions } from './describe';
 import { resize } from './resize';
 import { edit, EditOptions } from './edit';
 import { tag, TagOptions, TagResponse } from './tag';
 
 export { describe, resize, edit, tag };
-export type { EditOptions, TagOptions, TagResponse };
+export type { EditOptions, TagOptions, TagResponse, DescribeOptions };

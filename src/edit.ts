@@ -5,18 +5,27 @@ export interface EditOptions {
     aspectRatio?: 'match_input_image' | '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
     outputFormat?: 'jpg' | 'png';
     model?: 'flux-kontext-max' | 'google/nano-banana' | 'seedream-4';
+    token?: string;
+    apiKey?: string;
 }
 
 export async function edit(image: string, options: EditOptions) {
     try {
         const resizedImage = await resize(image);
 
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+        };
+
+        if (options.token) {
+            headers['Authorization'] = `Bearer ${options.token}`;
+        } else {
+            headers['x-api-key'] = options.apiKey || process.env.COREVIZ_API_KEY || "";
+        }
+
         const response = await fetch(`https://lab.coreviz.io/api/ai/edit`, {
             method: 'POST',
-            headers: {
-                'x-api-key': process.env.COREVIZ_API_KEY || "",
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 image: resizedImage,
                 prompt: options.prompt,
