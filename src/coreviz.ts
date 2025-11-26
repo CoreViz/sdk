@@ -207,7 +207,6 @@ export class CoreViz {
 
             const MODEL_ID = 'Xenova/clip-vit-large-patch14';
 
-            console.log(`Loading local model ${MODEL_ID}...`);
             const start = Date.now();
 
             // Load tokenizer and processor
@@ -221,8 +220,6 @@ export class CoreViz {
             const vision_model = await CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, {
                 dtype: 'q4',
             });
-
-            console.log(`Model loaded in ${Date.now() - start}ms`);
 
             // Check if input is likely an image
             const isImage = options?.type === 'image' ||
