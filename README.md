@@ -1,6 +1,6 @@
 # @coreviz/sdk
 
-The official JavaScript/TypeScript SDK for CoreViz's Vision AI APIs. Easily integrate powerful image analysis and manipulation features into your applications.
+Easily integrate powerful image analysis and manipulation features into your applications with CoreViz (https://coreviz.io/) 's Vision SDK.
 
 ## Installation
 
@@ -19,6 +19,18 @@ const coreviz = new CoreViz({
     apiKey: process.env.COREVIZ_API_KEY // or 'your_api_key_here'
 });
 ```
+
+## Demos
+
+The CoreViz SDK powers both the [coreviz.io](https://coreviz.io/) platform and the [CoreViz CLI](https://github.com/coreviz/cli), providing fast, consistent AI image analysis and manipulation capabilities across environments.
+
+You can try out the live demos and tools built with this SDK at [coreviz.io/tools](https://coreviz.io/tools), including:
+
+- **Image Description**: Generate detailed captions for any image. ![Demo](https://coreviz.io/tools/describe)
+- **Tagging / Classification**: Classify images with custom or general prompts. ![Demo](https://coreviz.io/tools/tag)
+- **Image Editing**: Modify or retouch images using generative AI based on text instructions.  ![Demo](https://coreviz.io/tools/edit)
+
+Check out [coreviz.io/tools](https://coreviz.io/tools) to explore these features interactively.
 
 ## API Reference
 
@@ -88,6 +100,43 @@ const editedImage = await coreviz.edit('https://example.com/photo.jpg', {
   prompt: "Make it look like a painting",
   aspectRatio: "1:1"
 });
+```
+
+### `coreviz.embed(input, options?)`
+
+Generates embeddings for image or text inputs, enabling semantic search and similarity comparison. Use with `coreviz.similarity(embeddingA, embeddingB)` to compare two images or an image and a text.
+
+**Parameters:**
+- `input` (string): The text string or image (URL/base64) to embed.
+- `options` (object, optional):
+  - `type` ('image' | 'text', optional): Explicitly define the input type.
+  - `mode` ('api' | 'local', optional): Execution mode (default: `'api'`). `'local'` runs in-browser/node using transformers.js.
+
+**Returns:**
+- `Promise<EmbedResponse>`: An object containing:
+  - `embedding` (number[]): The high-dimensional vector representation.
+
+**Example:**
+
+```typescript
+const { embedding } = await coreviz.embed('A photo of a sunset');
+```
+
+### `coreviz.similarity(embeddingA, embeddingB)`
+
+Calculates the degree of similarity between two embeddings.
+
+**Parameters:**
+- `embeddingA` (number[]): The first image/text embedding.
+- `embeddingB` (number[]): The second image/text embedding.
+
+**Returns:**
+- `number`: A similarity score between -1 and 1.
+
+**Example:**
+
+```typescript
+const similarity = coreviz.similarity(embeddingA, embeddingB);
 ```
 
 ### `coreviz.resize(input, maxWidth?, maxHeight?)`
